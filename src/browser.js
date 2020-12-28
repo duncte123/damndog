@@ -48,5 +48,6 @@ export async function selectOption(option) {
 export async function nextRound() {
     //document.querySelector('.button-holder button')
 
-    await page.click('.button-holder button');
+    // await page.click('.button-holder button');
+    await page.$eval('.button-holder button', button => button.click());
 }
