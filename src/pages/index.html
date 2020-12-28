@@ -5,13 +5,29 @@
         <meta name="viewport"
               content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
         <meta http-equiv="X-UA-Compatible" content="ie=edge">
-        <title>Document</title>
+        <title>Damn Dog control panel</title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.9.1/css/bulma.min.css" integrity="sha512-ZRv40llEogRmoWgZwnsqke3HNzJ0kiI0+pcMgiz2bxO6Ew1DVBtWjVn0qjrXdT3+u+pSN36gLgmJiiQ3cQtyzA==" crossorigin="anonymous" />
     </head>
     <body>
-        <button id="next">Next Round</button>
-        <button id="poll">Start Poll</button>
 
-        <p>Current poll link: <a href="" target="_blank" id="pollLink"></a></p>
+        <section class="section">
+            <div class="container">
+                <div class="columns">
+                    <div class="column">
+                        <button id="poll" class="button is-large is-primary is-light">Start Poll</button>
+                    </div>
+                    <div class="column">
+                        <button id="count" class="button is-large is-success is-light">Count Votes</button>
+                    </div>
+                    <div class="column">
+                        <button id="next" class="button is-large is-danger is-light">Next Round</button>
+                    </div>
+                </div>
+
+                <p>Current poll link: <a href="" target="_blank" id="pollLink"></a></p>
+                <p id="options"></p>
+            </div>
+        </section>
 
         <script>
             const _ = (id) => document.getElementById(id);
@@ -25,6 +41,11 @@
             _('poll').addEventListener('click', (e) => {
                 e.preventDefault();
                 startPoll();
+            });
+
+            _('count').addEventListener('click', (e) => {
+                e.preventDefault();
+                runVotes();
             });
 
             function nextRound() {
@@ -44,10 +65,40 @@
 
                                 pollLink.innerHTML = link;
                                 pollLink.setAttribute('href', link);
+
+                                _('options').innerHTML = `
+                                <ol>
+                                    ${data.poll.options.map((option) => `<li>${option}</li>`).join('')}
+                                </ol>
+                            `
                             }
 
                             console.log(`[start poll] ${JSON.stringify(data)}`);
                         });
+            }
+
+            function runVotes() {
+                const href = pollLink.getAttribute('href');
+                const index = href.lastIndexOf('/');
+                const pollId = href.substr(index + 1);
+
+                console.log(`Poll id: ${pollId}`)
+
+                fetch(`/count-votes?pollId=${pollId}`)
+                    .then((res) => res.json())
+                    .then((data) => {
+                        if (data.success) {
+                            const items = Object.keys(data.poll);
+
+                            _('options').innerHTML = `
+                                <ol>
+                                    ${items.map((option) => `<li>${option} => ${data.poll[option]}</li>`).join('')}
+                                </ol>
+                            `
+                        }
+
+                        console.log(`[count votes] ${JSON.stringify(data)}`);
+                    });
             }
         </script>
     </body>
