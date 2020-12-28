@@ -1,11 +1,11 @@
 import puppeteer from "puppeteer";
 
 /**
- * @var puppeteer.Browser
+ * @var {Browser}
  */
 let browser;
 /**
- * @var puppeteer.Page
+ * @var {Page}
  */
 let page;
 

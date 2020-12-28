@@ -1,6 +1,8 @@
-import {__dirname, sleep} from "./helpers.js";
+import { __dirname } from "./helpers.js";
 import express from 'express';
 import { getOptions, selectOption, nextRound } from "./browser.js";
+import { makePoll } from './strawpoll.js';
+import { sendPollToChat } from './twitch.js';
 const app = express();
 
 app.get('/', function (req, res) {
@@ -13,14 +15,34 @@ app.get('/next-round', async function (req, res) {
 })
 
 app.get('/start-poll', async function (req, res) {
-    const options = await getOptions();
+    res.set('Content-Type', 'application/json');
 
-    // TODO: make poll
-    await sleep(2);
+    try {
+        const options = await getOptions();
 
-    await selectOption(options[1]);
+        console.log(options);
 
-    res.send(options);
+        const response = await makePoll({ options });
+
+        await sendPollToChat(response.id);
+
+        res.send(JSON.stringify({
+            success: true,
+            poll: response,
+        }));
+    } catch (e) {
+        console.error(e);
+        res.send(JSON.stringify({
+            success: false,
+            error: e,
+        }));
+    }
+})
+
+app.get('/count-votes', async function (req, res) {
+    res.set('Content-Type', 'application/json');
+
+    res.send('OK');
 })
 
 const port = process.env.PORT || 3000;

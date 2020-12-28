@@ -11,8 +11,11 @@
         <button id="next">Next Round</button>
         <button id="poll">Start Poll</button>
 
+        <p>Current poll link: <a href="" target="_blank" id="pollLink"></a></p>
+
         <script>
             const _ = (id) => document.getElementById(id);
+            const pollLink = _('pollLink');
 
             _('next').addEventListener('click', (e) => {
                 e.preventDefault();
@@ -34,9 +37,16 @@
 
             function startPoll() {
                 fetch('/start-poll')
-                        .then((res) => res.text())
-                        .then((txt) => {
-                            console.log(`[start poll] ${txt}`);
+                        .then((res) => res.json())
+                        .then((data) => {
+                            if (data.success) {
+                                const link = `https://www.strawpoll.me/${data.poll.id}`;
+
+                                pollLink.innerHTML = link;
+                                pollLink.setAttribute('href', link);
+                            }
+
+                            console.log(`[start poll] ${JSON.stringify(data)}`);
                         });
             }
         </script>
