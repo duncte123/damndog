@@ -8,4 +8,4 @@ dotenv.config();
 
 initStrawClient();
 initBrowser();
-// initTwitch();
+initTwitch();
