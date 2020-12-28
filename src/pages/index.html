@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport"
+              content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>Document</title>
+    </head>
+    <body>
+        <button id="next">Next Round</button>
+        <button id="poll">Start Poll</button>
+
+        <script>
+            const _ = (id) => document.getElementById(id);
+
+            _('next').addEventListener('click', (e) => {
+                e.preventDefault();
+                nextRound();
+            });
+
+            _('poll').addEventListener('click', (e) => {
+                e.preventDefault();
+                startPoll();
+            });
+
+            function nextRound() {
+                fetch('/next-round')
+                        .then((res) => res.text())
+                        .then((txt) => {
+                            console.log(`[next round] ${txt}`);
+                        });
+            }
+
+            function startPoll() {
+                fetch('/start-poll')
+                        .then((res) => res.text())
+                        .then((txt) => {
+                            console.log(`[start poll] ${txt}`);
+                        });
+            }
+        </script>
+    </body>
+</html>

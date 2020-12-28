@@ -1,4 +1,4 @@
-import puppeteer from 'puppeteer';
+import puppeteer from "puppeteer";
 
 /**
  * @var puppeteer.Browser
@@ -29,9 +29,24 @@ export async function initBrowser() {
         height,
     });
 
-    // await page.goto('https://damn.dog/');
+    await page.goto('https://damn.dog/');
 }
 
 export function getOptions() {
-    // document.querySelector('[data-display="guess"]').firstChild.options
+    // document.querySelector('[data-display="guess"] select').options
+    return page.evaluate(() => {
+        const optionsSelector = document.querySelector('[data-display="guess"] select').options;
+
+        return Array.from(optionsSelector).filter((o) => !o.disabled).map((o) => o.value);
+    });
+}
+
+export async function selectOption(option) {
+    await page.select('[data-display="guess"] select', option);
+}
+
+export async function nextRound() {
+    //document.querySelector('.button-holder button')
+
+    await page.click('.button-holder button');
 }
