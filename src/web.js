@@ -2,7 +2,7 @@ import { __dirname } from "./helpers.js";
 import express from 'express';
 import { getOptions, selectOption, nextRound } from "./browser.js";
 import { getOptionWithMostVotes, loadPollResults, makePoll } from './strawpoll.js';
-import { sendPollToChat } from './twitch.js';
+import { sendPollToChat, createPoll as createTwitchPoll } from './twitch.js';
 const app = express();
 
 app.get('/', function (req, res) {
@@ -20,16 +20,30 @@ app.get('/start-poll', async function (req, res) {
     try {
         const options = await getOptions();
 
-        console.log(options);
+        if (process.env.USE_TWITCH_POLLS === 'true') {
+            await createTwitchPoll(options);
 
-        const response = await makePoll({ options });
+            res.send(JSON.stringify({
+                success: true,
+                poll: {
+                    options,
+                },
+                poll_source: 'TWITCH',
+            }));
+        } else {
 
-        await sendPollToChat(response.id);
+            console.log(options);
 
-        res.send(JSON.stringify({
-            success: true,
-            poll: response,
-        }));
+            const response = await makePoll({ options });
+
+            await sendPollToChat(response.id);
+
+            res.send(JSON.stringify({
+                success: true,
+                poll: response,
+                poll_source: 'STRAWPOL',
+            }));
+        }
     } catch (e) {
         console.error(e);
         res.send(JSON.stringify({

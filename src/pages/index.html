@@ -61,6 +61,19 @@
                         .then((res) => res.json())
                         .then((data) => {
                             if (data.success) {
+                                if (data.poll_source === 'TWITCH') {
+                                    pollLink.innerHTML = '(on twitch)';
+                                    pollLink.setAttribute('href', '');
+                                    _('options').innerHTML = `
+                                            <ol>
+                                                ${data.poll.options.map((option) => `<li>${option}</li>`).join('')}
+                                            </ol>`;
+                                    _('count').disabled = true;
+                                    return;
+                                }
+
+                                _('count').disabled = false;
+
                                 const link = `https://www.strawpoll.me/${data.poll.id}`;
 
                                 pollLink.innerHTML = link;
@@ -80,7 +93,7 @@
             function runVotes() {
                 const href = pollLink.getAttribute('href');
                 const index = href.lastIndexOf('/');
-                const pollId = href.substr(index + 1);
+                const pollId = href.substring(index + 1);
 
                 console.log(`Poll id: ${pollId}`)
 

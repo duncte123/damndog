@@ -12,6 +12,8 @@ let page;
 export async function initBrowser() {
     const width = 1920;
     const height = 1080;
+    // const width = 1280;
+    // const height = 720;
 
     browser = await puppeteer.launch({
         headless: false,
